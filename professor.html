@@ -20,6 +20,11 @@
 
 
     <body onload="init()">
+        검색 : <input type="text" id="search">
+        <input type="button" id="searchbtn" value="검색" onclick="search()"><br>
+        <input type="button" id="sortbyDate" value="생성일로 정렬" onclick="sortbyDate()">
+        <input type="button" id="sortbyDuration" value="응시기간으로 정렬" onclick="sortbyDuration()">
+        <input type="button" id="sortbyAvg" value="평균으로 정렬" onclick="sortbyAvg()">
         <table id="info_table">
             <thead>
                 <th></th>
@@ -39,11 +44,11 @@
 
 
         <script>
-            function init(){
-                var s = '[{"name": "나의 기분","make":"2019-12-05","duration": 7,"time": 2,"auto": "false","applicantsInfo": [{"done":10,"total":30,"list":[{}]}],"average": 78,},{"name": "하기 싫다","make":"2019-12-07","duration": 3,"time": 1,"auto": "true","applicantsInfo": [{"done":30,"total":41,"list":[{}]}],"average": 100}]';
-                var tests = eval("(" + s + ")");
-                var length = Object.keys(tests).length;
+            var s = '[{"name": "나의 기분","make":"2019-12-05","duration": 7,"time": 2,"auto": "false","applicantsInfo": [{"done":10,"total":30,"list":[{}]}],"average": 78,},{"name": "하기 싫다","make":"2019-12-07","duration": 3,"time": 1,"auto": "true","applicantsInfo": [{"done":30,"total":41,"list":[{}]}],"average": 100},{"name": "하기 싫니","make":"2019-12-01","duration": 1,"time": 12,"auto": "true","applicantsInfo": [{"done":30,"total":41,"list":[{}]}],"average": 100}]';
+            var tests = eval("(" + s + ")");
+            var length = Object.keys(tests).length;
 
+            function init(){
                 for(var i=0;i<length;i++){
                     add_row(i, tests);
                 }
@@ -77,6 +82,7 @@
 
                 var table = document.getElementById('info_table');
                 for (var i=1;i<table.rows.length;i++){
+                    console.log(i);
                     if(document.getElementsByTagName("tr")[i].cells[0].firstChild.checked){
                         table.deleteRow(i);
                         document.getElementsByTagName("tr")[i].cells[0].firstChild.checked = false;
@@ -95,8 +101,94 @@
                 }
             }
 
-            function sorting(){
-                
+            function sortwithIndex(arr){
+                for(var i=0;i<arr.length;i++){
+                    arr[i]=[arr[i], i];
+                }
+                arr.sort(function(left, right){
+                    return left[0]<right[0]?-1:1;
+                });
+                var sortIndices=[];
+                for(var j=0;j<arr.length;j++){
+                    sortIndices[j]=arr[j][1];
+                    arr[j]=arr[j][0];
+                }
+                return sortIndices;
+            }
+
+            function sortbyDate(){
+                var array = [];
+                for(var i=0;i<length;i++){
+                    array.push(tests[i].make);
+                }
+                var index = sortwithIndex(array);
+
+                var table = document.getElementById('info_table');
+                for(var i=0;i<table.rows.length-1;i){
+                    table.deleteRow(i+1);
+                }
+
+                for(var i=0;i<length;i++){
+
+                    add_row(index[i], tests);
+                }
+            }
+
+            function sortbyDuration(){
+                var array = [];
+                for(var i=0;i<length;i++){
+                    array.push(tests[i].duration);
+                }
+                var index = sortwithIndex(array);
+
+                var table = document.getElementById('info_table');
+                for(var i=0;i<table.rows.length-1;i){
+                    table.deleteRow(i+1);
+                }
+
+                for(var i=0;i<length;i++){
+
+                    add_row(index[i], tests);
+                }
+            }
+
+            function sortbyAvg(){
+                var array = [];
+                for(var i=0;i<length;i++){
+                    array.push(tests[i].average);
+                }
+                var index = sortwithIndex(array);
+
+                var table = document.getElementById('info_table');
+                for(var i=0;i<table.rows.length-1;i){
+                    table.deleteRow(i+1);
+                }
+
+                for(var i=0;i<length;i++){
+
+                    add_row(index[i], tests);
+                }
+            }
+
+            function search(){
+                var s = document.getElementById('search').value;
+
+                if(s==""){
+                    alert("검색어를 입력해주세요");
+                    return;
+                }
+
+                var table = document.getElementById('info_table');
+                for (var i=1;i<table.rows.length;i){
+                    table.deleteRow(i);                      
+                }
+                                    
+                for(var i=0;i<length;i++){
+                    if(tests[i].name == s){
+                        add_row(i, tests);
+                    }
+                }
+            
             }
 
         </script>
